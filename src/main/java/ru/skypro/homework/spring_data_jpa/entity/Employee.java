@@ -1,4 +1,4 @@
-package ru.skypro.homework.spring_data_jpa.employee;
+package ru.skypro.homework.spring_data_jpa.entity;
 
 import com.fasterxml.jackson.annotation.JsonCreator;
 import jakarta.persistence.*;
@@ -20,14 +20,13 @@ public class Employee {
     private String name;
     private int salary;
 
+    @ManyToOne (cascade = CascadeType.ALL)
+    @JoinColumn (name = "shared_id")
+    private Position position;
+
     @JsonCreator
     public Employee(String name, int salary) {
         this.name = name;
         this.salary = salary;
-    }
-
-    @Override
-    public String toString() {
-        return id + ". " + name + " Зарплата = " + salary + " руб.";
     }
 }

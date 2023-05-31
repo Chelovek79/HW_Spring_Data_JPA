@@ -3,7 +3,7 @@ package ru.skypro.homework.spring_data_jpa.controller;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 import ru.skypro.homework.spring_data_jpa.dto.EmployeeDTO;
-import ru.skypro.homework.spring_data_jpa.employee.Employee;
+import ru.skypro.homework.spring_data_jpa.dto.EmployeeFullInfo;
 import ru.skypro.homework.spring_data_jpa.service.EmployeeService;
 
 import java.util.List;
@@ -46,5 +46,30 @@ public class EmployeeController {
     @GetMapping("/salaryHigherThan")
     public List<EmployeeDTO> getAllEmployeeHaveSalaryHigher(@RequestParam("salary") Integer salary) {
         return employeeService.getAllEmployeeHaveSalaryHigher(salary);
+    }
+
+    @GetMapping("/withHighestSalary")
+    public List<EmployeeFullInfo> getEmployeeWithMaxSalary() {
+        return employeeService.getEmployeeWithMaxSalary();
+    }
+
+    @GetMapping("/{id}/fullInfo")
+    public EmployeeFullInfo getEmployeeByIdFullInfo(@PathVariable String id) {
+        int idEmployee = Integer.parseInt(id);
+        return employeeService.getEmployeeByIdFullInfo(idEmployee);
+    }
+
+    @GetMapping("")
+    public List<EmployeeDTO> getEmployeeByOnePosition(@RequestParam(value = "position", defaultValue = "") String position) {
+        if (position.equals("") ) {
+            return employeeService.getAllEmployee();
+        } else {
+            return employeeService.getEmployeeByOnePosition(position);
+        }
+    }
+
+    @GetMapping("/page")
+    public List<EmployeeFullInfo> getEmployeeWithPaging (@RequestParam (value = "page", defaultValue = "0") Integer page) {
+       return employeeService.getEmployeeWithPaging(page, 3);
     }
 }

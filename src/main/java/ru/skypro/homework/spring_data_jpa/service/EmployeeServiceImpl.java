@@ -1,9 +1,12 @@
 package ru.skypro.homework.spring_data_jpa.service;
 
 import lombok.SneakyThrows;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import ru.skypro.homework.spring_data_jpa.dto.EmployeeDTO;
-import ru.skypro.homework.spring_data_jpa.employee.Employee;
+import ru.skypro.homework.spring_data_jpa.dto.EmployeeFullInfo;
+import ru.skypro.homework.spring_data_jpa.entity.Employee;
 import ru.skypro.homework.spring_data_jpa.repository.EmployeeRepository;
 
 import java.util.List;
@@ -22,32 +25,33 @@ public class EmployeeServiceImpl implements EmployeeService {
 
     @Override
     public List<EmployeeDTO> getAllEmployee() {
-        List<Employee> employees = (List<Employee>) employeeRepository.findAll();
+        List<Employee> employees = (List<Employee>) employeeRepository.getAllEmployee();
         return employees.stream()
                 .map(EmployeeDTO::fromEmployee)
                 .collect(Collectors.toList());
     }
 
-    @SneakyThrows
     @Override
     public EmployeeDTO getEmployeeDTOById(int id) {
-        Employee employee = employeeRepository.findById(id)
-                .orElseThrow(() -> new Exception("Работник с таким табельным номером отсутствует."));
-        return fromEmployee(employee);
+        checkId(id);
+        return fromEmployee(employeeRepository.getEmployeeById(id));
     }
 
     @Override
     public void createNewOne(EmployeeDTO employeeDTO) {
-        employeeRepository.save(employeeDTO.toEmployee());
+        Employee employee = employeeDTO.toEmployee();
+        employeeRepository.createNewOne(employee.getName(), employee.getSalary());
     }
 
     @Override
     public void deletingEmployeeById(int id) {
-        employeeRepository.deleteById(id);
+        checkId(id);
+        employeeRepository.deleteEmployeeById(id);
     }
 
     @Override
     public void changeEmployeeById(int id, EmployeeDTO employeeDTO) {
+        checkId(id);
         Employee employee = employeeDTO.toEmployee();
         String name = employee.getName();
         int salary = employee.getSalary();
@@ -59,5 +63,38 @@ public class EmployeeServiceImpl implements EmployeeService {
         return employeeRepository.findBySalaryGreaterThan(salary).stream()
                 .map(EmployeeDTO::fromEmployee)
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<EmployeeFullInfo> getEmployeeWithMaxSalary() {
+        return employeeRepository.getEmployeeWithMaxSalary();
+    }
+
+    @Override
+    public EmployeeFullInfo getEmployeeByIdFullInfo(int id) {
+        checkId(id);
+        return employeeRepository.getEmployeeByIdFullInfo(id);
+    }
+
+    @Override
+    public List<EmployeeDTO> getEmployeeByOnePosition(String position) {
+        return employeeRepository.getEmployeeByOnePosition(position).stream()
+                .map(EmployeeDTO::fromEmployee)
+                .collect(Collectors.toList());
+    }
+
+    @Override
+    public List<EmployeeFullInfo> getEmployeeWithPaging(int pageIndex, int unitPerPage) {
+        PageRequest employeeOfConcretePage = PageRequest.of(pageIndex, unitPerPage);
+        Page<EmployeeFullInfo> page = employeeRepository.findAllpage(employeeOfConcretePage);
+        return page.stream()
+                .collect(Collectors.toList());
+    }
+
+    @SneakyThrows
+    public void checkId(int id) {
+        if (!employeeRepository.checkId(id)) {
+            throw new Exception("Табельный номер отсутствует в списке.");
+        }
     }
 }

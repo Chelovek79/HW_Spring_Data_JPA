@@ -1,12 +1,17 @@
 package ru.skypro.homework.spring_data_jpa.dto;
 
-import ru.skypro.homework.spring_data_jpa.employee.Employee;
+import lombok.Data;
+import ru.skypro.homework.spring_data_jpa.entity.Employee;
 
+@Data
 public class EmployeeDTO {
 
     private Integer id;
     private String name;
     private Integer salary;
+
+    public EmployeeDTO() {
+    }
 
     public static EmployeeDTO fromEmployee(Employee employee) {
         EmployeeDTO employeeDTO = new EmployeeDTO();
@@ -22,29 +27,5 @@ public class EmployeeDTO {
         employee.setName(this.getName());
         employee.setSalary(this.getSalary());
         return employee;
-    }
-
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
-    }
-
-    public Integer getSalary() {
-        return salary;
-    }
-
-    public void setSalary(Integer salary) {
-        this.salary = salary;
     }
 }
